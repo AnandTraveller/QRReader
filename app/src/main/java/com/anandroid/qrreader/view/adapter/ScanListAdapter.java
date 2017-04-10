@@ -33,16 +33,23 @@ public class ScanListAdapter extends RecyclerView.Adapter<ScanListAdapter.MyView
     private ArrayList<String> listData;
     private Fragment fragment;
 
+    public interface DataPass {
+        void dataArray(ArrayList<String> arrayList);
+    }
+
+    private DataPass dataPass;
+
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
 
         private TextView txtData;
+        private ImageView delete;
 
 
         public MyViewHolder(View view) {
             super(view);
             txtData = (TextView) view.findViewById(R.id.txtData);
-
+            delete = (ImageView) view.findViewById(R.id.delete);
 
         }
     }
@@ -50,6 +57,7 @@ public class ScanListAdapter extends RecyclerView.Adapter<ScanListAdapter.MyView
 
     public ScanListAdapter(Fragment fragment, ArrayList<String> listData) {
         this.fragment = fragment;
+        dataPass = (DataPass) fragment;
         this.listData = listData;
     }
 
@@ -65,11 +73,12 @@ public class ScanListAdapter extends RecyclerView.Adapter<ScanListAdapter.MyView
     public void onBindViewHolder(final MyViewHolder holder, final int position) {
 
         holder.txtData.setText(listData.get(position));
-        holder.txtData.setOnClickListener(new View.OnClickListener() {
+        holder.delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 listData.remove(position);
                 notifyDataSetChanged();
+                ((HomeScreen) fragment).dataFrag(listData);
             }
         });
 

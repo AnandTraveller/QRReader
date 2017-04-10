@@ -60,7 +60,7 @@ import butterknife.Unbinder;
  * Created by Admin on 3/13/2017.
  */
 
-public class HomeScreen extends Fragment implements QRCodeReaderView.OnQRCodeReadListener {
+public class HomeScreen extends Fragment implements QRCodeReaderView.OnQRCodeReadListener, ScanListAdapter.DataPass {
 
     private TextView resultTextView;
     private QRCodeReaderView qrCodeReaderView;
@@ -306,6 +306,13 @@ public class HomeScreen extends Fragment implements QRCodeReaderView.OnQRCodeRea
         scanListAdapter.updateList(listDatas);
     }
 
+    @Override
+    public void dataArray(ArrayList<String> arrayList) {
+
+        listDatas.clear();
+        listDatas = arrayList;
+    }
+
     public class QrGene extends AsyncTask<Object, Object, Bitmap>
 
     {
@@ -365,6 +372,14 @@ public class HomeScreen extends Fragment implements QRCodeReaderView.OnQRCodeRea
 
 
         }
+    }
+
+    public void dataFrag(ArrayList<String> data) {
+
+        listDatas.clear();
+        listDatas = data;
+        Log.i("ttttttttttttttttttttt",""+listDatas.toString());
+
     }
 
 }
