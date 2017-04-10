@@ -21,6 +21,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -70,6 +71,9 @@ public class HomeScreen extends Fragment implements QRCodeReaderView.OnQRCodeRea
     private Set<String> setDatas;
     private ArrayList<String> listDatas;
     private int[] arrayNum;
+    private InputMethodManager imm;
+    private ViewGroup viewContainer;
+    private boolean isAlreadyRunning = false;
 
     private ScanListAdapter scanListAdapter;
     @BindView(R.id.scan_list_recyc)
@@ -122,11 +126,22 @@ public class HomeScreen extends Fragment implements QRCodeReaderView.OnQRCodeRea
         }
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        //Hide the soft keyboard
+        imm.hideSoftInputFromWindow(viewContainer.getWindowToken(), 0);
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View viewRoot = inflater.inflate(R.layout.home_screen_frag, container, false);
         unbinder = ButterKnife.bind(this, viewRoot);
+
+        viewContainer = container;
+        imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+
 
         qrCodeReaderView = (QRCodeReaderView) viewRoot.findViewById(R.id.qrdecoderview);
         resultTextView = (TextView) viewRoot.findViewById(R.id.result_text_view);
@@ -209,7 +224,14 @@ public class HomeScreen extends Fragment implements QRCodeReaderView.OnQRCodeRea
     public void onConfirm(View view) {
         // Using AsyncTask to Generate Or Image
         if (listDatas.size() > 0) {
-            task.execute();
+            if (!isAlreadyRunning) {
+                isAlreadyRunning = true;
+                task.execute();
+            } else {
+                Toast.makeText(mBaseAct, "Processing", Toast.LENGTH_SHORT).show();
+
+            }
+
         } else {
             Toast.makeText(mBaseAct, "No Products in List", Toast.LENGTH_SHORT).show();
         }
@@ -221,6 +243,7 @@ public class HomeScreen extends Fragment implements QRCodeReaderView.OnQRCodeRea
         //
         progres_bar_homepage.setVisibility(View.GONE);
         task.cancel(true);
+        isAlreadyRunning = false;
 
 
     }
@@ -301,7 +324,9 @@ public class HomeScreen extends Fragment implements QRCodeReaderView.OnQRCodeRea
             Log.i("Temp", "" + datatemp);
         }*/
 
+
         total_txtJ.setText(totalValue + " Rs");
+        Log.i("Display Set ", "" + setDatas.toString());
         Log.i("Display ", "" + listDatas.toString());
         scanListAdapter.updateList(listDatas);
     }
@@ -364,6 +389,7 @@ public class HomeScreen extends Fragment implements QRCodeReaderView.OnQRCodeRea
 
         @Override
         protected void onPostExecute(Bitmap bitmap) {
+            isAlreadyRunning = false;
             super.onPostExecute(bitmap);
             //  imageView.setImageBitmap(bitmap);
             progres_bar_homepage.setVisibility(View.VISIBLE);
@@ -375,10 +401,9 @@ public class HomeScreen extends Fragment implements QRCodeReaderView.OnQRCodeRea
     }
 
     public void dataFrag(ArrayList<String> data) {
-
-        listDatas.clear();
+        //  listDatas.clear();
         listDatas = data;
-        Log.i("ttttttttttttttttttttt",""+listDatas.toString());
+        Log.i("ttttttttttttttttttttt", "" + listDatas.toString());
 
     }
 

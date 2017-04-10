@@ -15,7 +15,9 @@ import android.content.Intent;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.transition.Slide;
 import android.util.Log;
+import android.view.Gravity;
 
 import butterknife.ButterKnife;
 
@@ -114,12 +116,15 @@ public class MainActivity extends AppCompatActivity {
 
     public void addHomeScreenFragment() {
 
+        HomeScreen homeSc = HomeScreen.newInstance(data);
+        homeSc.setEnterTransition(new Slide(Gravity.RIGHT));
+        homeSc.setExitTransition(new Slide(Gravity.LEFT));
         data.putInt(FragmentKey.INDEX, 1);
         data.putString(FROM_TAG, Constants.FROM_TAG);
         getSupportFragmentManager()
                 .beginTransaction()
                 //   .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right)
-                .add(R.id.main_login_container, HomeScreen.newInstance(data), "HomeScreen")
+                .add(R.id.main_login_container, homeSc, "HomeScreen")
                 .addToBackStack("HomeScreen")
                 .commitAllowingStateLoss();
     }

@@ -14,6 +14,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 
+import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -97,6 +98,8 @@ public class LoginFrag extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View viewRoot = inflater.inflate(R.layout.login_frag, container, false);
         unbinder = ButterKnife.bind(this, viewRoot);
+        cus_id_login.addTextChangedListener(new GenericTextWatcher(cus_id_login));
+
         return viewRoot;
     }
 
@@ -163,15 +166,8 @@ public class LoginFrag extends Fragment {
 
             for (int i : cusId) {
                 if (value == i) {
-                    if (ContextCompat.checkSelfPermission(mBaseAct, Manifest.permission.CAMERA)
-                            != PackageManager.PERMISSION_GRANTED) {
-                        ActivityCompat.requestPermissions(mBaseAct,
-                                new String[]{Manifest.permission.CAMERA}, ZBAR_CAMERA_PERMISSION);
-                    } else {
-                        ((MainActivity) getActivity()).addHomeScreenFragment();
 
-                    }
-
+                    permission();
                 }
 
             }
@@ -180,6 +176,18 @@ public class LoginFrag extends Fragment {
             Toast.makeText(mBaseAct, "Please Enter Id", Toast.LENGTH_SHORT).show();
         }
 
+    }
+
+    private void permission() {
+
+        if (ContextCompat.checkSelfPermission(mBaseAct, Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(mBaseAct,
+                    new String[]{Manifest.permission.CAMERA}, ZBAR_CAMERA_PERMISSION);
+        } else {
+            ((MainActivity) getActivity()).addHomeScreenFragment();
+
+        }
     }
 
 
@@ -194,6 +202,40 @@ public class LoginFrag extends Fragment {
                     Toast.makeText(mBaseAct, "Please grant camera permission", Toast.LENGTH_SHORT).show();
                 }
                 return;
+        }
+    }
+
+    //Declaration
+    private class GenericTextWatcher implements TextWatcher {
+
+        private View view;
+
+        private GenericTextWatcher(View view) {
+            this.view = view;
+        }
+
+        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+        }
+
+        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+         /*   if (charSequence.length() > 2) {
+                int value = Integer.parseInt(cus_id_login.getText().toString());
+
+                for (int j : cusId) {
+                    if (value == j) {
+
+                        permission();
+                    }
+
+                }
+
+
+            }*/
+        }
+
+        public void afterTextChanged(Editable editable) {
+
         }
     }
 }

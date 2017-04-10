@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -77,6 +78,9 @@ public class ScanListAdapter extends RecyclerView.Adapter<ScanListAdapter.MyView
             @Override
             public void onClick(View v) {
                 listData.remove(position);
+                Log.i("Position == ", "" + position);
+                Log.i("Remaining Data", "" + listData.toString());
+                //  notifyItemRemoved(position);
                 notifyDataSetChanged();
                 ((HomeScreen) fragment).dataFrag(listData);
             }
