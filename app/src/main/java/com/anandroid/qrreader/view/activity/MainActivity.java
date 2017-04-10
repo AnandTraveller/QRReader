@@ -1,5 +1,6 @@
 package com.anandroid.qrreader.view.activity;
 
+import android.graphics.Bitmap;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
@@ -8,16 +9,15 @@ import com.anandroid.qrreader.utills.Constants;
 import com.anandroid.qrreader.utills.FragmentKey;
 import com.anandroid.qrreader.view.fragment.HomeScreen;
 import com.anandroid.qrreader.view.fragment.LoginFrag;
+import com.anandroid.qrreader.view.fragment.SummaryFrag;
 
 import android.content.Intent;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import android.util.Log;
 
 import butterknife.ButterKnife;
-
 
 public class MainActivity extends AppCompatActivity {
 
@@ -60,8 +60,14 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if (!popFragment()) {
-            //finish();
+
+        Fragment f = getSupportFragmentManager().findFragmentByTag("HomeScreen");
+        Fragment summaryfrag = getSupportFragmentManager().findFragmentByTag("SummaryFrag");
+        if (f instanceof HomeScreen) {//the fragment on which you want to handle your back press
+            Log.i("BACK PRESSED", "BACK PRESSED");
+        } else if (summaryfrag instanceof SummaryFrag) {//the fragment on which you want to handle your back press
+            Log.i("BACK PRESSED", "BACK PRESSED");
+        } else {
             super.onBackPressed();
         }
     }
@@ -106,7 +112,6 @@ public class MainActivity extends AppCompatActivity {
         return isPop;
     }
 
-
     public void addHomeScreenFragment() {
 
         data.putInt(FragmentKey.INDEX, 1);
@@ -118,4 +123,18 @@ public class MainActivity extends AppCompatActivity {
                 .addToBackStack("HomeScreen")
                 .commitAllowingStateLoss();
     }
+
+    public void addSummaryFragment(Bitmap bitmap) {
+
+        data.putInt(FragmentKey.INDEX, 2);
+        data.putString(FROM_TAG, Constants.FROM_TAG);
+        data.putParcelable("image", bitmap);
+        getSupportFragmentManager()
+                .beginTransaction()
+                //   .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right)
+                .add(R.id.main_login_container, SummaryFrag.newInstance(data), "SummaryFrag")
+                .addToBackStack("SummaryFrag")
+                .commitAllowingStateLoss();
+    }
+
 }

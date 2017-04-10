@@ -49,8 +49,10 @@ public class LoginFrag extends Fragment {
 
     @BindView(R.id.login_btn)
     Button login_btnJ;
+    @BindView(R.id.cus_id_login)
+    EditText cus_id_login;
     private static final int ZBAR_CAMERA_PERMISSION = 1;
-
+    int[] cusId = {111, 222, 333, 444, 555};
 
     public LoginFrag() {
         super();
@@ -64,10 +66,11 @@ public class LoginFrag extends Fragment {
     private int hideIndex = -1;
     protected AppCompatActivity mBaseAct;
     protected Context mBaseCon;
-
+    private LoginFrag fragment;
 
     public static LoginFrag newInstance(Bundle tag) {
         LoginFrag fragment = new LoginFrag();
+        fragment = fragment;
         Bundle args = tag;
         fragment.setArguments(args);
         return fragment;
@@ -155,14 +158,28 @@ public class LoginFrag extends Fragment {
     public void loginClick(View view) {
         Log.i("The Login", " Clicked");
 
-        if (ContextCompat.checkSelfPermission(mBaseAct, Manifest.permission.CAMERA)
-                != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(mBaseAct,
-                    new String[]{Manifest.permission.CAMERA}, ZBAR_CAMERA_PERMISSION);
-        } else {
-            ((MainActivity) getActivity()).addHomeScreenFragment();
+        if (cus_id_login.length() > 0) {
+            int value = Integer.parseInt(cus_id_login.getText().toString());
 
+            for (int i : cusId) {
+                if (value == i) {
+                    if (ContextCompat.checkSelfPermission(mBaseAct, Manifest.permission.CAMERA)
+                            != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(mBaseAct,
+                                new String[]{Manifest.permission.CAMERA}, ZBAR_CAMERA_PERMISSION);
+                    } else {
+                        ((MainActivity) getActivity()).addHomeScreenFragment();
+
+                    }
+
+                }
+
+            }
+
+        } else {
+            Toast.makeText(mBaseAct, "Please Enter Id", Toast.LENGTH_SHORT).show();
         }
+
     }
 
 

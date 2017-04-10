@@ -4,4 +4,8 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
     <color name="colordarkgreen">#0E5A5A</color>
+   <!-- // Qr-->
+    <color name="QRCodeWhiteColor">#ffffff</color>
+
+    <color name="QRCodeBlackColor">#000000</color>
 </resources>

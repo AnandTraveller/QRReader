@@ -1,7 +1,9 @@
 package com.anandroid.qrreader.view.fragment;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.PointF;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -24,6 +26,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,6 +36,10 @@ import com.anandroid.qrreader.utills.PointsOverlayView;
 import com.anandroid.qrreader.view.activity.MainActivity;
 import com.anandroid.qrreader.view.adapter.ScanListAdapter;
 import com.dlazaro66.qrcodereaderview.QRCodeReaderView;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.MultiFormatWriter;
+import com.google.zxing.WriterException;
+import com.google.zxing.common.BitMatrix;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -62,11 +69,21 @@ public class HomeScreen extends Fragment implements QRCodeReaderView.OnQRCodeRea
     private PointsOverlayView pointsOverlayView;
     private Set<String> setDatas;
     private ArrayList<String> listDatas;
+    private int[] arrayNum;
 
     private ScanListAdapter scanListAdapter;
     @BindView(R.id.scan_list_recyc)
     RecyclerView scan_list_recyc;
+    @BindView(R.id.total_txt)
+    TextView total_txtJ;
+    @BindView(R.id.confirm_img)
+    ImageView confirm_imgJ;
+    @BindView(R.id.progres_bar_homepage)
+    ProgressBar progres_bar_homepage;
+    private QrGene task;
 
+    public final static int QRcodeWidth = 500;
+    Bitmap bitmap;
 
     public HomeScreen() {
         super();
@@ -117,9 +134,8 @@ public class HomeScreen extends Fragment implements QRCodeReaderView.OnQRCodeRea
         enableDecodingCheckBox = (CheckBox) viewRoot.findViewById(R.id.enable_decoding_checkbox);
         pointsOverlayView = (PointsOverlayView) viewRoot.findViewById(R.id.points_overlay_view);
 
-
+        arrayNum = new int[100];
         initQRCodeReaderView();
-
         return viewRoot;
     }
 
@@ -134,6 +150,7 @@ public class HomeScreen extends Fragment implements QRCodeReaderView.OnQRCodeRea
 
         listDatas = new ArrayList<>();
         setDatas = new HashSet<String>();
+        task = new QrGene();
 
         scanListAdapter = new ScanListAdapter(HomeScreen.this, listDatas);
 
@@ -162,6 +179,7 @@ public class HomeScreen extends Fragment implements QRCodeReaderView.OnQRCodeRea
         super.onResume();
 
         if (qrCodeReaderView != null) {
+            // qrCodeReaderView.startCamera();
             qrCodeReaderView.startCamera();
         }
 
@@ -186,7 +204,30 @@ public class HomeScreen extends Fragment implements QRCodeReaderView.OnQRCodeRea
         ((MainAC) getActivity()).uiBackPressed();
     }*/
 
+
+    @OnClick(R.id.confirm_img)
+    public void onConfirm(View view) {
+        // Using AsyncTask to Generate Or Image
+        if (listDatas.size() > 0) {
+            task.execute();
+        } else {
+            Toast.makeText(mBaseAct, "No Products in List", Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+    @OnClick(R.id.progres_bar_homepage)
+    public void progressCancel(View view) {
+        //
+        progres_bar_homepage.setVisibility(View.GONE);
+        task.cancel(true);
+
+
+    }
+
+
     @Override
+
     public void onDestroyView() {
         super.onDestroyView();
 
@@ -230,15 +271,100 @@ public class HomeScreen extends Fragment implements QRCodeReaderView.OnQRCodeRea
     public void onQRCodeRead(String text, PointF[] points) {
         resultTextView.setText(text);
         Log.i("Done", "" + text);
-        // Log.i("Filtered", "" + String.format("%d", text));
-        Log.i("Filtered", "" + text.replaceAll("\\D+", ""));
 
+        // Filtering Integer
+        String amount = text.replaceAll("\\D+", "");
+        Log.i("Filtered", "" + amount);
         pointsOverlayView.setPoints(points);
         setDatas.add(text);
         listDatas = new ArrayList<>(setDatas);
-        Log.i("Display ", "" + listDatas.toString());
-        Log.i("Display 1 ", "" + setDatas.toString());
-        scanListAdapter.updateList(listDatas);
 
+        int totalValue = 0;
+
+        for (String str : listDatas) {
+
+            String amt = str.replaceAll("\\D+", "").trim();
+
+            totalValue = totalValue + Integer.valueOf(amt);
+
+            Log.i("Amount", "" + totalValue);
+        }
+  /*      for (int i = 0; i <= listDatas.size(); i++) {
+            // Replacing Integer with ""
+            //  totalValue = totalValue + Integer.parseInt("1");
+            // totalValue = totalValue + Integer.valueOf("1");
+
+            String datatemp = listDatas.get(i).toString().replace("\\D+", "").trim();
+            //  String tempData = Integer.parseInt(listDatas.get(i).replace(listDatas.get(i), "").trim());
+            //  totalValue = totalValue + Integer.parseInt(text.replace(listDatas.get(i), "").trim());
+            //  Log.i("String Filtered", "" + totalValue);
+            Log.i("Temp", "" + datatemp);
+        }*/
+
+        total_txtJ.setText(totalValue + " Rs");
+        Log.i("Display ", "" + listDatas.toString());
+        scanListAdapter.updateList(listDatas);
     }
+
+    public class QrGene extends AsyncTask<Object, Object, Bitmap>
+
+    {
+        BitMatrix bitMatrix;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progres_bar_homepage.setVisibility(View.VISIBLE);
+
+        }
+
+        @Override
+        protected Bitmap doInBackground(Object... params) {
+
+            try {
+
+                bitMatrix = new MultiFormatWriter().encode(listDatas.toString(),
+                        BarcodeFormat.DATA_MATRIX.QR_CODE,
+                        QRcodeWidth, QRcodeWidth, null
+                );
+
+            } catch (IllegalArgumentException Illegalargumentexception) {
+
+                return null;
+            } catch (WriterException e) {
+                e.printStackTrace();
+            }
+            int bitMatrixWidth = bitMatrix.getWidth();
+
+            int bitMatrixHeight = bitMatrix.getHeight();
+
+            int[] pixels = new int[bitMatrixWidth * bitMatrixHeight];
+
+            for (int y = 0; y < bitMatrixHeight; y++) {
+                int offset = y * bitMatrixWidth;
+
+                for (int x = 0; x < bitMatrixWidth; x++) {
+
+                    pixels[offset + x] = bitMatrix.get(x, y) ?
+                            getResources().getColor(R.color.QRCodeBlackColor) : getResources().getColor(R.color.QRCodeWhiteColor);
+                }
+            }
+            Bitmap bitmap = Bitmap.createBitmap(bitMatrixWidth, bitMatrixHeight, Bitmap.Config.ARGB_4444);
+
+            bitmap.setPixels(pixels, 0, 500, 0, 0, bitMatrixWidth, bitMatrixHeight);
+            return bitmap;
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap bitmap) {
+            super.onPostExecute(bitmap);
+            //  imageView.setImageBitmap(bitmap);
+            progres_bar_homepage.setVisibility(View.VISIBLE);
+
+            ((MainActivity) getActivity()).addSummaryFragment(bitmap);
+
+
+        }
+    }
+
 }

@@ -34,7 +34,6 @@ public class ScanListAdapter extends RecyclerView.Adapter<ScanListAdapter.MyView
     private Fragment fragment;
 
 
-
     public class MyViewHolder extends RecyclerView.ViewHolder {
 
         private TextView txtData;
@@ -66,6 +65,13 @@ public class ScanListAdapter extends RecyclerView.Adapter<ScanListAdapter.MyView
     public void onBindViewHolder(final MyViewHolder holder, final int position) {
 
         holder.txtData.setText(listData.get(position));
+        holder.txtData.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listData.remove(position);
+                notifyDataSetChanged();
+            }
+        });
 
     }
 
