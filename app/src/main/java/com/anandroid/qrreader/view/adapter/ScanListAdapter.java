@@ -24,7 +24,7 @@ import java.util.List;
 
 
 /**
- * Created by Charles on 2/27/2017.
+ * Created by Anand on 2/27/2017.
  */
 
 public class ScanListAdapter extends RecyclerView.Adapter<ScanListAdapter.MyViewHolder> {
