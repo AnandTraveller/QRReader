@@ -167,7 +167,7 @@ public class LoginFrag extends Fragment {
             int value = Integer.parseInt(cus_id_login.getText().toString());
             // Passing Value
             // customerId.onCustId(value);
-          ((MainActivity) getActivity()).cusId(value);
+            ((MainActivity) getActivity()).cusId(value);
 
             for (int i : cusId) {
                 if (value == i) {
