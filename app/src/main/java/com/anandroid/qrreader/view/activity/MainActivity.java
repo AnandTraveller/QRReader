@@ -26,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String CURRENT_TAG = MainActivity.class.getSimpleName();
 
     private String FROM_TAG;
+    public String cusIdd = "";
 
     private Bundle data = new Bundle();
 
@@ -69,8 +70,23 @@ public class MainActivity extends AppCompatActivity {
             Log.i("BACK PRESSED", "BACK PRESSED");
         } else if (summaryfrag instanceof SummaryFrag) {//the fragment on which you want to handle your back press
             Log.i("BACK PRESSED", "BACK PRESSED");
+            Fragment homescreenFrag = getSupportFragmentManager().findFragmentByTag("SummaryFrag");
+
+            homescreenFrag.setEnterTransition(new Slide(Gravity.RIGHT));
+            homescreenFrag.setExitTransition(new Slide(Gravity.LEFT));
+            data.putInt(FragmentKey.INDEX, 1);
+            data.putString(FROM_TAG, Constants.FROM_TAG);
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    //   .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right)
+                    .replace(R.id.main_login_container, homescreenFrag, "HomeScreen")
+                    .addToBackStack("HomeScreen")
+                    .detach(homescreenFrag)
+                    .attach(homescreenFrag)
+                    .commit();
+
         } else {
-            super.onBackPressed();
+            //super.onBackPressed();
         }
     }
 
@@ -124,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
         getSupportFragmentManager()
                 .beginTransaction()
                 //   .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right)
-                .add(R.id.main_login_container, homeSc, "HomeScreen")
+                .replace(R.id.main_login_container, homeSc, "HomeScreen")
                 .addToBackStack("HomeScreen")
                 .commitAllowingStateLoss();
     }
@@ -137,9 +153,31 @@ public class MainActivity extends AppCompatActivity {
         getSupportFragmentManager()
                 .beginTransaction()
                 //   .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right)
-                .add(R.id.main_login_container, SummaryFrag.newInstance(data), "SummaryFrag")
+                .replace(R.id.main_login_container, SummaryFrag.newInstance(data), "SummaryFrag")
                 .addToBackStack("SummaryFrag")
                 .commitAllowingStateLoss();
     }
+
+    public int cusId(int value) {
+        cusIdd = "" + value;
+        return value;
+    }
+
+    public void addRefreshHomeScreenFragment() {
+
+        HomeScreen homeSc = HomeScreen.newInstance(data);
+
+        homeSc.setEnterTransition(new Slide(Gravity.RIGHT));
+        homeSc.setExitTransition(new Slide(Gravity.LEFT));
+        data.putInt(FragmentKey.INDEX, 1);
+        data.putString(FROM_TAG, Constants.FROM_TAG);
+        getSupportFragmentManager()
+                .beginTransaction()
+                //   .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right)
+                .replace(R.id.main_login_container, homeSc, "HomeScreen")
+                .addToBackStack("HomeScreen")
+                .commit();
+    }
+
 
 }

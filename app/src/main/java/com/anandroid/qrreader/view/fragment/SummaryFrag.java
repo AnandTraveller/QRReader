@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import com.anandroid.qrreader.R;
 import com.anandroid.qrreader.utills.PointsOverlayView;
+import com.anandroid.qrreader.view.activity.MainActivity;
 import com.anandroid.qrreader.view.adapter.ScanListAdapter;
 import com.dlazaro66.qrcodereaderview.QRCodeReaderView;
 
@@ -25,13 +26,16 @@ import java.util.Set;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import butterknife.Unbinder;
+
+import static android.R.attr.fragment;
 
 /**
  * Created by Admin on 3/13/2017.
  */
 
-public class SummaryFrag extends Fragment {
+public class SummaryFrag extends Fragment implements LoginFrag.CustomerId {
 
     private TextView resultTextView;
     private QRCodeReaderView qrCodeReaderView;
@@ -45,6 +49,10 @@ public class SummaryFrag extends Fragment {
     private ScanListAdapter scanListAdapter;
     @BindView(R.id.summary_qr_img)
     ImageView summary_qr_img;
+    @BindView(R.id.txt_cus_id_summary)
+    TextView txt_cus_id_summary;
+    @BindView(R.id.back_summmary)
+    ImageView back_summmary;
 
     public SummaryFrag() {
         super();
@@ -101,6 +109,8 @@ public class SummaryFrag extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        txt_cus_id_summary.setText("Customer ID:" + ((MainActivity) getActivity()).cusIdd.toString());
+
         try {
             data = getArguments();
             if (null != data) {
@@ -111,6 +121,7 @@ public class SummaryFrag extends Fragment {
 
         } catch (Exception e) {
         }
+
     }
 
 
@@ -126,6 +137,11 @@ public class SummaryFrag extends Fragment {
 
     }
 
+    @OnClick(R.id.back_summmary)
+    public void onUiBackPressed(View view) {
+        getActivity().getSupportFragmentManager().popBackStackImmediate();
+        // ((MainActivity) getActivity()).addRefreshHomeScreenFragment();
+    }
 
     /* @OnClick(R.id.chat_back_img)
     public void onUiBackPressed(View view) {
@@ -146,7 +162,6 @@ public class SummaryFrag extends Fragment {
 
     public void onDestroyView() {
         super.onDestroyView();
-
         unbinder.unbind();
     }
 
@@ -158,4 +173,8 @@ public class SummaryFrag extends Fragment {
         super.onDetach();
     }
 
+    @Override
+    public void onCustId(int id) {
+        txt_cus_id_summary.setText("Customer ID: " + id);
+    }
 }

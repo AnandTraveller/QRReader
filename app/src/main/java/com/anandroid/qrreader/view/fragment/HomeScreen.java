@@ -392,8 +392,8 @@ public class HomeScreen extends Fragment implements QRCodeReaderView.OnQRCodeRea
             isAlreadyRunning = false;
             super.onPostExecute(bitmap);
             //  imageView.setImageBitmap(bitmap);
-            progres_bar_homepage.setVisibility(View.VISIBLE);
-
+            progres_bar_homepage.setVisibility(View.GONE);
+            //  onDetach();
             ((MainActivity) getActivity()).addSummaryFragment(bitmap);
 
 
@@ -404,6 +404,31 @@ public class HomeScreen extends Fragment implements QRCodeReaderView.OnQRCodeRea
         //  listDatas.clear();
         listDatas = data;
         Log.i("ttttttttttttttttttttt", "" + listDatas.toString());
+
+        int totalValue = 0;
+
+        for (String str : listDatas) {
+
+            String amt = str.replaceAll("\\D+", "").trim();
+
+            totalValue = totalValue + Integer.valueOf(amt);
+
+            Log.i("Amount", "" + totalValue);
+        }
+  /*      for (int i = 0; i <= listDatas.size(); i++) {
+            // Replacing Integer with ""
+            //  totalValue = totalValue + Integer.parseInt("1");
+            // totalValue = totalValue + Integer.valueOf("1");
+
+            String datatemp = listDatas.get(i).toString().replace("\\D+", "").trim();
+            //  String tempData = Integer.parseInt(listDatas.get(i).replace(listDatas.get(i), "").trim());
+            //  totalValue = totalValue + Integer.parseInt(text.replace(listDatas.get(i), "").trim());
+            //  Log.i("String Filtered", "" + totalValue);
+            Log.i("Temp", "" + datatemp);
+        }*/
+
+
+        total_txtJ.setText(totalValue + " Rs");
 
     }
 

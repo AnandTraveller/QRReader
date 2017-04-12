@@ -1,6 +1,7 @@
 package com.anandroid.qrreader.view.fragment;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -68,6 +69,7 @@ public class LoginFrag extends Fragment {
     protected AppCompatActivity mBaseAct;
     protected Context mBaseCon;
     private LoginFrag fragment;
+    private CustomerId customerId;
 
     public static LoginFrag newInstance(Bundle tag) {
         LoginFrag fragment = new LoginFrag();
@@ -163,6 +165,9 @@ public class LoginFrag extends Fragment {
 
         if (cus_id_login.length() > 0) {
             int value = Integer.parseInt(cus_id_login.getText().toString());
+            // Passing Value
+            // customerId.onCustId(value);
+          ((MainActivity) getActivity()).cusId(value);
 
             for (int i : cusId) {
                 if (value == i) {
@@ -230,7 +235,6 @@ public class LoginFrag extends Fragment {
 
                 }
 
-
             }*/
         }
 
@@ -238,4 +242,11 @@ public class LoginFrag extends Fragment {
 
         }
     }
+
+    public interface CustomerId {
+        /*Callback for when an item has been selected. */
+        public void onCustId(int id);
+    }
+
+
 }
