@@ -1,5 +1,6 @@
 package com.anandroid.qrreader.view.activity;
 
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -19,16 +20,21 @@ import android.transition.Slide;
 import android.util.Log;
 import android.view.Gravity;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String CURRENT_TAG = MainActivity.class.getSimpleName();
-
     private String FROM_TAG;
+    public static String DATAS = "datas";
     public String cusIdd = "";
-
     private Bundle data = new Bundle();
+    private SharedPreferences myPrefs;
 
     //public final Resources res = App.getInstance().getResources();
 
@@ -44,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
         if (savedInstanceState == null) {
             initFragment();
         }
+
 
     }
 
@@ -179,5 +186,32 @@ public class MainActivity extends AppCompatActivity {
                 .commit();
     }
 
+    public void setDatas(ArrayList<String> arrayList) {
 
+        //Set Preference
+        myPrefs = getSharedPreferences("myPrefs", MODE_WORLD_READABLE);
+        SharedPreferences.Editor prefsEditor;
+        prefsEditor = myPrefs.edit();
+//strVersionName->Any value to be stored
+        Set<String> set = new HashSet<String>();
+        set.addAll(arrayList);
+        prefsEditor.putStringSet(DATAS, set);
+        prefsEditor.commit();
+        // prefsEditor.putString(DATAS, values);
+
+    }
+
+    public ArrayList<String> getStoredArrayList() {
+        //Get Preferenece
+        SharedPreferences myPrefs;
+        ArrayList<String> arrayList=new ArrayList<>();
+        myPrefs = getSharedPreferences("myPrefs", MODE_WORLD_READABLE);
+        // String StoredValue = myPrefs.getString(DATAS, "null");
+
+        Set<String> set = myPrefs.getStringSet(DATAS, null);
+        if(set!=null){
+            arrayList = new ArrayList<String>(set);
+        }
+        return  arrayList;
+    }
 }

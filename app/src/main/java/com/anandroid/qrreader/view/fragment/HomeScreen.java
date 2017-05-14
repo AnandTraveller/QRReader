@@ -7,8 +7,10 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.MainThread;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 
@@ -35,6 +37,7 @@ import android.widget.Toast;
 import com.anandroid.qrreader.R;
 import com.anandroid.qrreader.utills.PointsOverlayView;
 import com.anandroid.qrreader.view.activity.MainActivity;
+import com.anandroid.qrreader.view.adapter.PastOrdersAdapter;
 import com.anandroid.qrreader.view.adapter.ScanListAdapter;
 import com.dlazaro66.qrcodereaderview.QRCodeReaderView;
 import com.google.zxing.BarcodeFormat;
@@ -63,7 +66,7 @@ import butterknife.Unbinder;
 
 public class HomeScreen extends Fragment implements QRCodeReaderView.OnQRCodeReadListener, ScanListAdapter.DataPass {
 
-    private TextView resultTextView;
+    private TextView resultTextView, past_order_txt, current_order_txt;
     private QRCodeReaderView qrCodeReaderView;
     private CheckBox flashlightCheckBox;
     private CheckBox enableDecodingCheckBox;
@@ -74,10 +77,14 @@ public class HomeScreen extends Fragment implements QRCodeReaderView.OnQRCodeRea
     private InputMethodManager imm;
     private ViewGroup viewContainer;
     private boolean isAlreadyRunning = false;
+    private ArrayList<String> sharedArrayList;
 
     private ScanListAdapter scanListAdapter;
+    private PastOrdersAdapter pastOrderAdapter;
     @BindView(R.id.scan_list_recyc)
     RecyclerView scan_list_recyc;
+    @BindView(R.id.past_list_recyc)
+    RecyclerView past_list_recyc;
     @BindView(R.id.total_txt)
     TextView total_txtJ;
     @BindView(R.id.confirm_img)
@@ -142,12 +149,13 @@ public class HomeScreen extends Fragment implements QRCodeReaderView.OnQRCodeRea
         viewContainer = container;
         imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
 
-
         qrCodeReaderView = (QRCodeReaderView) viewRoot.findViewById(R.id.qrdecoderview);
         resultTextView = (TextView) viewRoot.findViewById(R.id.result_text_view);
         flashlightCheckBox = (CheckBox) viewRoot.findViewById(R.id.flashlight_checkbox);
         enableDecodingCheckBox = (CheckBox) viewRoot.findViewById(R.id.enable_decoding_checkbox);
         pointsOverlayView = (PointsOverlayView) viewRoot.findViewById(R.id.points_overlay_view);
+        past_order_txt = (TextView) viewRoot.findViewById(R.id.past_order_txt);
+        current_order_txt = (TextView) viewRoot.findViewById(R.id.current_order_txt);
 
         arrayNum = new int[100];
         initQRCodeReaderView();
@@ -157,6 +165,22 @@ public class HomeScreen extends Fragment implements QRCodeReaderView.OnQRCodeRea
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        sharedArrayList = ((MainActivity) getActivity()).getStoredArrayList();
+        if (sharedArrayList != null && !(sharedArrayList.size() > 0)) {
+            Log.i("STRING DATAS", "" + sharedArrayList.toString());
+            past_order_txt.setVisibility(View.GONE);
+        } else {
+            Toast.makeText(mBaseAct, "Past Orders Available", Toast.LENGTH_SHORT).show();
+            Log.i("STRING DATAS", "" + sharedArrayList.toString());
+            pastOrderAdapter = new PastOrdersAdapter(HomeScreen.this, sharedArrayList);
+            RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
+            past_list_recyc.setLayoutManager(layoutManager);
+            past_list_recyc.setItemAnimator(new DefaultItemAnimator());
+            past_list_recyc.smoothScrollToPosition(0);
+            past_list_recyc.setHasFixedSize(true);
+            past_list_recyc.setAdapter(pastOrderAdapter);
+        }
     }
 
     @Override
@@ -219,6 +243,26 @@ public class HomeScreen extends Fragment implements QRCodeReaderView.OnQRCodeRea
         ((MainAC) getActivity()).uiBackPressed();
     }*/
 
+    @OnClick(R.id.current_order_txt)
+    public void onCurrent(View view) {
+        // Using AsyncTask to Generate Or Image
+        scan_list_recyc.setVisibility(View.VISIBLE);
+        past_list_recyc.setVisibility(View.GONE);
+
+        past_order_txt.setTextColor(ContextCompat.getColor(getActivity(), R.color.color_dim));
+        current_order_txt.setTextColor(ContextCompat.getColor(getActivity(), R.color.QRCodeWhiteColor));
+
+    }
+
+    @OnClick(R.id.past_order_txt)
+    public void onPast(View view) {
+        scan_list_recyc.setVisibility(View.GONE);
+
+        past_order_txt.setTextColor(ContextCompat.getColor(getActivity(), R.color.QRCodeWhiteColor));
+        current_order_txt.setTextColor(ContextCompat.getColor(getActivity(), R.color.color_dim));
+        past_list_recyc.setVisibility(View.VISIBLE);
+
+    }
 
     @OnClick(R.id.confirm_img)
     public void onConfirm(View view) {
@@ -394,8 +438,10 @@ public class HomeScreen extends Fragment implements QRCodeReaderView.OnQRCodeRea
             //  imageView.setImageBitmap(bitmap);
             progres_bar_homepage.setVisibility(View.GONE);
             //  onDetach();
-            ((MainActivity) getActivity()).addSummaryFragment(bitmap);
 
+            // Sending to Shared Preference
+            ((MainActivity) getActivity()).setDatas(listDatas);
+            ((MainActivity) getActivity()).addSummaryFragment(bitmap);
 
         }
     }

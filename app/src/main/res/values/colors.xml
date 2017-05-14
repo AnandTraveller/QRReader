@@ -7,5 +7,6 @@
     <color name="toolbar_dark_green">#064646</color>
     <!-- // Qr-->
     <color name="QRCodeWhiteColor">#ffffff</color>
+    <color name="color_dim">#71ac9e</color>
     <color name="QRCodeBlackColor">#000000</color>
 </resources>
